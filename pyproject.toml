@@ -1,0 +1,17 @@
+[project]
+name = "cli-data-ai"
+version = "0.1.0"
+description = "An agent-based CLI tool that lets you speak to your data as if you had a team of data analysts"
+authors = [
+    {name = "Mattia Pennacchietti",email = "1404268@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
