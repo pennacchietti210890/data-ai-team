@@ -5,7 +5,7 @@ A powerful command-line interface tool that lets you interact with your data usi
 ## A CLI to chat with your data
 
 <h1>
-  <img src="assets/cli_preview.png"/>
+  <img src="assets/cli_preview_v2.png"/>
 </h1>
 
 ## Features
