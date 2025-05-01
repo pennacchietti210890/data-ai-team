@@ -1,6 +1,7 @@
 import typer
 from agents import Runner
 from cli_data_ai.agents.data_analysts.sql_analyst import sql_analyst
+from cli_data_ai.agents.data_analysts.dashboard_analyst import dashboard_analyst
 import asyncio
 from cli_data_ai.utils.config import settings, get_settings
 from rich.console import Console
@@ -60,6 +61,34 @@ def ask(question: str):
                 # If not JSON, display as markdown
                 console.print(Markdown(answer.final_output.query_results))
         
+        # Add a success message
+        console.print("\n[bold green]✓ Analysis complete![/bold green]")
+            
+    except Exception as e:
+        typer.secho(f"❌ Error: {str(e)}", fg=typer.colors.RED, bold=True)
+        raise typer.Exit(1)
+
+@app.command(name="ask_dashboard_analyst")
+def ask(question: str):
+    """
+    Ask a natural language question to visualise your data.
+    """
+    try:        
+        # Display the question in a nice panel
+        console.print(Panel(
+            f"[bold blue]Question:[/bold blue] {question}",
+            title="[bold green]Dashboard/Visualisation Request[/bold green]",
+            border_style="green"
+        ))
+        
+        # Show a spinner while processing
+        with console.status("[bold green]Creating visualisations for your data...[/bold green]"):
+            answer = asyncio.run(Runner.run(dashboard_analyst, input=question))
+        
+        # Format and display the SQL query if present
+        if hasattr(answer.final_output, 'chart_link') and answer.final_output.chart_link:
+            console.print("\n[bold blue]Generated Visualisation Link:[/bold blue]")
+            console.print(Markdown(answer.final_output.chart_link))        
         # Add a success message
         console.print("\n[bold green]✓ Analysis complete![/bold green]")
             
