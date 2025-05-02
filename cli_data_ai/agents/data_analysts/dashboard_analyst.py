@@ -16,7 +16,7 @@ def create_dashboard_analyst():
         os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
         
     return Agent(
-        name="Visualisation Analyst",
+        name="Visualisation agent",
         tools=[login_visualisation_tool, create_metabase_chart, create_metabase_dashboard, append_chart_to_metabase_dashboard],  
         model="gpt-4o-mini",
         instructions=(

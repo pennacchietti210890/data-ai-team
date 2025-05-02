@@ -17,7 +17,7 @@ def create_sql_analyst():
         os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
         
     return Agent(
-        name="SQL Analyst",
+        name="SQL agent",
         tools=[describe_database, profile_database, sql_query_tool],
         model="gpt-4o-mini",  # Using GPT-4 as it's better for SQL analysis
         instructions=(

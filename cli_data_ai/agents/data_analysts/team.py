@@ -4,8 +4,9 @@ from pydantic import BaseModel
 from agents import Agent, FunctionTool, RunContextWrapper
 from cli_data_ai.agents.data_analysts.sql_analyst import sql_analyst
 from cli_data_ai.agents.data_analysts.dashboard_analyst import dashboard_analyst
+from cli_data_ai.utils.config import get_settings
 
-def create_managert():
+def create_team():
     settings = get_settings()
 
     # Explicitly set the environment variable from settings
@@ -29,11 +30,11 @@ def create_managert():
             "- Remember that the visualisation agent takes as input a SQL query string, not the query results itself from the SQL agent."      
         ),
         tools=[
-            sql_agent.as_tool(
+            sql_analyst.as_tool(
                 tool_name="sql_agent",
                 tool_description="SQL agent to inspect database and execute SQL queries",
             ),
-            visualisation_agent.as_tool(
+            dashboard_analyst.as_tool(
                 tool_name="visualisation_agent",
                 tool_description="Visualisation agent to create chart via metabase card questions as well as creating dashboards with those charts",
             )
@@ -41,4 +42,4 @@ def create_managert():
     )
 
 # Create the agent instance
-manager = create_manager()
+manager = create_team()
