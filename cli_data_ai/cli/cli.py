@@ -3,6 +3,7 @@ from agents import Runner
 from cli_data_ai.agents.data_analysts.sql_analyst import sql_analyst
 from cli_data_ai.agents.data_analysts.dashboard_analyst import dashboard_analyst
 from cli_data_ai.agents.data_analysts.team import manager
+from cli_data_ai.agents.data_scientists.data_scientist import data_scientist
 import asyncio
 import os
 from cli_data_ai.utils.config import settings, get_settings
@@ -20,11 +21,9 @@ console = Console()
 AGENTS = {
     "SQL Analyst": sql_analyst,
     "Data Manager": manager,
+    "Data Scientist": data_scientist,
     # Add more agents here as they become available
 }
-
-# Initialize memory manager
-memory = SharedMemoryManager()
 
 def clear_screen():
     """Clear the terminal screen."""
@@ -55,10 +54,22 @@ def display_help():
     console.print("  [green]switch[/green] - Switch to a different agent")
     console.print("  [green]help[/green]   - Show this help message")
     console.print("  [green]clear[/green]  - Clear the terminal screen")
+    console.print("  [green]memory[/green] - Load previous conversation memory")
     console.print("  [green]exit[/green]   - Exit the program")
     console.print("  [green]quit[/green]   - Exit the program")
     console.print("  [green]q[/green]      - Exit the program")
     console.print("\n[dim]Or just type your question to get started![/dim]")
+
+def load_memory() -> SharedMemoryManager:
+    """Load conversation memory if it exists."""
+    memory = SharedMemoryManager()
+    try:
+        memory.load()
+        console.print("[green]✓ Conversation memory loaded successfully![/green]")
+        return memory
+    except Exception as e:
+        console.print(f"[red]❌ Error loading memory: {str(e)}[/red]")
+        return SharedMemoryManager()
 
 @app.callback()
 def main(ctx: typer.Context):
@@ -167,14 +178,20 @@ def interactive():
     console.print(f"\nSelected agent: [bold blue]{agent_name}[/bold blue]")
     display_help()
 
+    # Initialize empty memory
+    memory = SharedMemoryManager()
+
     while True:
         try:
             question = typer.prompt("\n>>")
             question = question.strip().lower()
-            memory.append_user(question)
-            chat_input = memory.get_chat_input()
+            
             # Handle special commands
             if question in {"exit", "quit", "q"}:
+                # Save memory before exiting
+                if memory.memory.messages:
+                    memory.memory.save()
+                    console.print("[green]✓ Conversation memory saved![/green]")
                 console.print("\n[bold green]Thank you for using Data Analyst CLI! Goodbye! 👋[/bold green]")
                 break
             elif question == "switch":
@@ -195,6 +212,9 @@ def interactive():
                 ))
                 display_help()
                 continue
+            elif question == "memory":
+                memory = load_memory()
+                continue
 
             # Display the question in a nice panel
             console.print(Panel(
@@ -203,9 +223,11 @@ def interactive():
                 border_style="green"
             ))
             
+            memory.append_user(question)
+            question = memory.get_chat_input()
             # Show a spinner while processing
             with console.status(f"[bold green]{agent_name} is analyzing your data...[/bold green]"):
-                answer = asyncio.run(Runner.run(selected_agent, input=chat_input))
+                answer = asyncio.run(Runner.run(selected_agent, input=question))
             
             # Format and display the SQL query if present
             if hasattr(answer.final_output, 'sql_query') and answer.final_output.sql_query and agent_name == "SQL Analyst":
@@ -227,10 +249,20 @@ def interactive():
                 console.print("\n[bold blue]Generated Analysis:[/bold blue]")
                 console.print(Markdown(answer.final_output))
 
-            memory.append_assistant(answer.final_output)
+            if answer.final_output and agent_name == "Data Scientist":
+                console.print("\n[bold blue]Generated ML Analysis:[/bold blue]")
+                console.print(Markdown(answer.final_output))
             
             # Add a success message
             console.print("\n[bold green]✓ Analysis complete![/bold green]")
+
+            # Store the conversation in memory
+            if hasattr(answer.final_output, 'sql_query') and answer.final_output.sql_query:
+                memory.append_assistant(answer.final_output.sql_query)
+            if hasattr(answer.final_output, 'query_results') and answer.final_output.query_results:
+                memory.append_assistant(answer.final_output.query_results)
+            elif answer.final_output:
+                memory.append_assistant(str(answer.final_output))
 
         except Exception as e:
             console.print(f"\n[red]❌ Error: {str(e)}[/red]")

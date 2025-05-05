@@ -37,7 +37,8 @@ class SharedMemory(BaseModel):
 
 class SharedMemoryManager:
     def __init__(self):
-        self.memory: SharedMemory = SharedMemory.load()
+        self.memory: SharedMemory = SharedMemory(messages=[])
+        #SharedMemory.load()
 
     def append_user(self, content: str):
         self.memory.append("user", content)

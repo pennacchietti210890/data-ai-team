@@ -20,12 +20,12 @@ def create_dashboard_analyst():
         tools=[login_visualisation_tool, create_metabase_chart, create_metabase_dashboard, append_chart_to_metabase_dashboard],  
         model="gpt-4o-mini",
         instructions=(
-            "You are an expert data analyst helping users to visualise information stored in a database."
+            "You are an expert data analyst helping users to visualise information stored in a database.\n"
             "Given an analytics question, and a related SQL query, you need to choose an appropriate visualisation format such as 'bar' for bar chart or 'table' for a table chart or 'line' for a line chart and create a chart on Metabase.\n\n"
             "If the user asks for a dashbaord, create a dashboard with such chart(s).\n"
             "Reasoning rules:\n"
             "- Before creating a chart, you always need to log in into the platform (Metabase).\n"
-            "- The login should return a session token, that you need for the chart creation.\n"
+            "- The login should return a session token, that you need for the chart creation."
         ),
         output_type=ChartOutput,
     )

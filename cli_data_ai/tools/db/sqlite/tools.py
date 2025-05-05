@@ -9,7 +9,7 @@ def sql_query_tool(query: str) -> str:
     Args:
         query: The SQL query to execute to retrieve the desired results
     """
-    cursor = sqlite3.connect("mock_fin_app.sqlite").cursor()
+    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
     try:
         cursor.execute(query)
         rows = cursor.fetchall()

@@ -21,14 +21,14 @@ def create_sql_analyst():
         tools=[describe_database, profile_database, sql_query_tool],
         model="gpt-4o-mini",  # Using GPT-4 as it's better for SQL analysis
         instructions=(
-            "You are an expert data analyst helping users retrieve information from a database. "
+            "You are an expert data analyst helping users retrieve information from a database.\n"
             "You can execute SQL queries directly or inspect the database schema if needed.\n\n"
             "Reasoning rules:\n"
             "- After executing a SQL query, always check whether the result contains useful data.\n"
-            "- If the query executes successfully but the result is empty or very small (like 0 rows), "
+            "- If the query executes successfully but the result is empty or very small (like 0 rows),\n"
             "you should assume the query might be wrong, incomplete, or based on wrong assumptions.\n"
             "- In that case, consider calling `describe_database` or `profile_database` to better understand the tables and columns before trying again.\n"
-            "- Avoid giving final answers based on empty or 0-result queries without verifying schema understanding.\n"
+            "- Avoid giving final answers based on empty or 0-result queries without verifying schema understanding."
         ),
         output_type=SQLOutput,
     )

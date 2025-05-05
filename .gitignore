@@ -41,3 +41,6 @@ data/chroma/
 *.db
 *.sqlite
 *.sqlite3
+
+# Memory
+memory/shared.json
