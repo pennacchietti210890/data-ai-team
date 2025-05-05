@@ -21,7 +21,7 @@ def sql_query_tool(query: str) -> str:
 def describe_database() -> str:
     """Describe the DataBase schema by listing tables available and their attributes
     """
-    cursor = sqlite3.connect("mock_fin_app.sqlite").cursor()
+    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
     # List all tables
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = [row[0] for row in cursor.fetchall()]
@@ -39,7 +39,7 @@ def describe_database() -> str:
 def profile_database()-> str:    
     """Describe in detail the possible values that the columns of the tables in the DataBase can assume. For example possible transaction types etc
     """
-    cursor = sqlite3.connect("mock_fin_app.sqlite").cursor()
+    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
     # Get all tables
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = [row[0] for row in cursor.fetchall()]

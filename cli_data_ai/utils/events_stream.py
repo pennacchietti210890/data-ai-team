@@ -30,9 +30,9 @@ async def stream_events(agent, input_question, context, max_turns):
                         console.print(f"\n🛠️ Tool called: {raw_call.name}")
                         console.print(f"   Arguments: {raw_call.arguments}")
                     case "tool_call_output_item":
-                        console.print(f"\n✅ Tool output: {item.output}")
+                        console.print(Markdown(f"\n✅ Tool output: {item.output}"))
                     case "final_output_item":
-                        console.print(f"\n🏁 Final output:\n{item.output}")
+                        console.print(Markdown(f"\n🏁 Final output:\n{item.output}"))
                     case "planning_start_item":
                         console.print(f"\n📍 Planning started...")
                     case "planning_response_item":
