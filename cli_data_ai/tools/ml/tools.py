@@ -4,6 +4,7 @@ import pandas as pd
 from agents import Agent, RunContextWrapper, Runner, function_tool
 import sqlite3
 from typing import List
+import json
 
 class InputData(BaseModel):
     df: pd.DataFrame

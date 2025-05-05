@@ -13,6 +13,9 @@ from rich.markdown import Markdown
 from rich.syntax import Syntax
 import json
 from cli_data_ai.memory.memory import SharedMemoryManager
+from cli_data_ai.utils.events_stream import stream_events
+from cli_data_ai.tools.ml.tools import InputData
+import pandas as pd
 
 app = typer.Typer(help="Data Analyst CLI", invoke_without_command=True)
 console = Console()
@@ -58,6 +61,9 @@ def display_help():
     console.print("  [green]exit[/green]   - Exit the program")
     console.print("  [green]quit[/green]   - Exit the program")
     console.print("  [green]q[/green]      - Exit the program")
+    console.print("\n[bold blue]Question Format:[/bold blue]")
+    console.print("  Add [green]--s[/green] at the end of your question for streaming response")
+    console.print("  Example: [dim]What are the top 5 customers? --s[/dim]")
     console.print("\n[dim]Or just type your question to get started![/dim]")
 
 def load_memory() -> SharedMemoryManager:
@@ -184,26 +190,31 @@ def interactive():
     while True:
         try:
             question = typer.prompt("\n>>")
-            question = question.strip().lower()
+            question = question.strip()
+            
+            # Check for streaming marker
+            is_streaming = question.endswith("--s")
+            if is_streaming:
+                question = question[:-3].strip()
             
             # Handle special commands
-            if question in {"exit", "quit", "q"}:
+            if question.lower() in {"exit", "quit", "q"}:
                 # Save memory before exiting
                 if memory.memory.messages:
                     memory.memory.save()
                     console.print("[green]✓ Conversation memory saved![/green]")
                 console.print("\n[bold green]Thank you for using Data Analyst CLI! Goodbye! 👋[/bold green]")
                 break
-            elif question == "switch":
+            elif question.lower() == "switch":
                 console.print("\n[bold blue]Switching agent...[/bold blue]")
                 selected_agent, agent_name = select_agent()
                 console.print(f"\nSwitched to agent: [bold blue]{agent_name}[/bold blue]")
                 display_help()
                 continue
-            elif question == "help":
+            elif question.lower() == "help":
                 display_help()
                 continue
-            elif question == "clear":
+            elif question.lower() == "clear":
                 clear_screen()
                 # Redisplay the current agent and help
                 console.print(Panel(
@@ -212,7 +223,7 @@ def interactive():
                 ))
                 display_help()
                 continue
-            elif question == "memory":
+            elif question.lower() == "memory":
                 memory = load_memory()
                 continue
 
@@ -225,9 +236,17 @@ def interactive():
             
             memory.append_user(question)
             question = memory.get_chat_input()
+
+            data_context = InputData(df=pd.DataFrame())
+            max_turns = 20
+
+            if is_streaming:
+                asyncio.run(stream_events(selected_agent, question, context=data_context, max_turns=max_turns))
+                continue
+            
             # Show a spinner while processing
             with console.status(f"[bold green]{agent_name} is analyzing your data...[/bold green]"):
-                answer = asyncio.run(Runner.run(selected_agent, input=question))
+                answer = asyncio.run(Runner.run(selected_agent, input=question, context=data_context, max_turns=max_turns))
             
             # Format and display the SQL query if present
             if hasattr(answer.final_output, 'sql_query') and answer.final_output.sql_query and agent_name == "SQL Analyst":
