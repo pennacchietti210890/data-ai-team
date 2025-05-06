@@ -237,7 +237,7 @@ def interactive():
             memory.append_user(question)
             question = memory.get_chat_input()
 
-            data_context = InputData(df=pd.DataFrame())
+            data_context = InputData(df=pd.DataFrame(), trained_models={}, trained_model=None, model_results=[])
             max_turns = 20
 
             if is_streaming:

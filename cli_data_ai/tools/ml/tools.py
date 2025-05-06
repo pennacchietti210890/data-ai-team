@@ -7,7 +7,10 @@ from typing import List
 import json
 
 class InputData(BaseModel):
-    df: pd.DataFrame
+    df: pd.DataFrame = None
+    trained_models: dict = {}  # Store all models by name
+    trained_model: object = None  # Store the best model
+    model_results: list = []  # Optional: store all results
     
     class Config:
         arbitrary_types_allowed = True
@@ -160,7 +163,18 @@ def run_model(wrapper: RunContextWrapper[InputData], target_column: str, model_t
         "score": score,
         "type": "classification" if target_type in ["binary", "multiclass"] else "regression"
     }
+    
+    if wrapper.context.trained_models is None:
+        wrapper.context.trained_models = {}
+    wrapper.context.trained_models[model_type] = model
+
+    
+    if wrapper.context.model_results is None:
+        wrapper.context.model_results = []
+    wrapper.context.model_results.append(results)
+
     return json.dumps(results)
+
 
 @function_tool
 def model_card_report(results_json: str) -> str:
@@ -178,3 +192,72 @@ def model_card_report(results_json: str) -> str:
     best = max(results, key=lambda r: r["score"])
     report += f"### Recommended Model: {best['model']} (Score: {best['score']:.4f})\n"
     return report
+
+@function_tool
+def select_best_model(wrapper: RunContextWrapper[InputData]) -> str:
+    """
+    Selects the best model from previously trained models based on score and sets it as the active model.
+    """
+    if not wrapper.context.model_results:
+        return "No model results available."
+
+    best = max(wrapper.context.model_results, key=lambda r: r["score"])
+    best_model_type = best["model"]
+    best_model = wrapper.context.trained_models.get(best_model_type)
+
+    if best_model:
+        wrapper.context.trained_model = best_model
+        return f"Best model selected: {best_model_type} with score {best['score']:.4f}"
+    else:
+        return f"Could not find model instance for '{best_model_type}' in context."
+
+@function_tool
+def feature_importance(wrapper: RunContextWrapper[InputData], model_type: str, target_column: str) -> str:
+    """
+    Returns feature importances from the best trained model if available.
+
+    Arguments:
+        model_type: One of: linear_regression, logistic_regression, random_forest, decision_tree,
+                    gradient_boosting, xgboost, mlp, svm
+        target_column: The name of the column to predict.
+
+    Returns:
+        A string with the ranked features and their importance scores.
+    """
+    import numpy as np
+
+    # Access model and data from context
+    model = wrapper.context.trained_model
+    df = wrapper.context.df
+
+    if model is None:
+        return "❌ No trained model found in context. Please run a model first."
+
+    if df is None or target_column not in df.columns:
+        return f"❌ Input data is missing or target column '{target_column}' not found."
+
+    # Prepare feature matrix
+    X = df.drop(columns=[target_column])
+
+    # Try to extract importances
+    try:
+        if hasattr(model, "feature_importances_"):
+            importances = model.feature_importances_
+        elif hasattr(model, "coef_"):
+            coef = model.coef_
+            if hasattr(coef, "ndim"):
+                importances = coef if coef.ndim == 1 else coef[0]
+            else:
+                importances = coef
+        else:
+            return f"⚠️ The model type '{model_type}' does not support feature importances."
+    except Exception as e:
+        return f"❌ Error extracting feature importances: {e}"
+
+    # Format output
+    try:
+        importances = np.asarray(importances)
+        ranked = sorted(zip(X.columns, importances), key=lambda x: -abs(x[1]))
+        return "\n".join([f"{f}: {round(imp, 4)}" for f, imp in ranked])
+    except Exception as e:
+        return f"❌ Failed to format importances: {e}"

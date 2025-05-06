@@ -2,7 +2,7 @@ import json
 import os
 from pydantic import BaseModel
 from agents import Agent, FunctionTool, RunContextWrapper
-from cli_data_ai.tools.ml.tools import get_input_data, choose_model, run_model, model_card_report
+from cli_data_ai.tools.ml.tools import get_input_data, choose_model, run_model, model_card_report, feature_importance, select_best_model
 from cli_data_ai.agents.data_analysts.sql_analyst import create_sql_analyst
 from cli_data_ai.utils.config import get_settings
 
@@ -25,7 +25,9 @@ def create_data_scientist():
             get_input_data, 
             choose_model, 
             run_model, 
-            model_card_report
+            model_card_report,
+            select_best_model,
+            feature_importance
         ],  
         model="gpt-4o-mini",
         instructions=(
@@ -42,7 +44,8 @@ def create_data_scientist():
             "   - The name of the target column\n"
             "   - The chosen model type\n"
             "6. Gather the results and pass them to `model_card_report` to summarize and interpret model quality and business impact.\n"
-            "7. Recommend next steps based on model findings.\n\n"
+            "7. If asked, also calcualte feature importance using the appropriate tool. For this, first look for the best model in the previously obtained results and use that for feature importance calculation.\n"
+            "8. Recommend next steps based on model findings.\n\n"
             "## Reminder\n"
             "- Always include the target variable in your SQL query.\n"
             "- Ensure data passed between tools is complete, well-formed, and JSON-encoded as a full DataFrame (not just values).\n"
