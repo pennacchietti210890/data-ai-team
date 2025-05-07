@@ -269,8 +269,28 @@ def interactive():
                 console.print(Markdown(answer.final_output))
 
             if answer.final_output and agent_name == "Data Scientist":
-                console.print("\n[bold blue]Generated ML Analysis:[/bold blue]")
-                console.print(Markdown(answer.final_output))
+                console.print("\n[bold blue]ML Analysis Report:[/bold blue]")
+                ml_report = answer.final_output
+                
+                # Display Overview
+                if hasattr(ml_report, 'baseline_model_results'):
+                    console.print("\n[bold cyan]Overview:[/bold cyan]")
+                    console.print(Markdown(ml_report.baseline_model_results))
+                
+                # Display Best Model
+                if hasattr(ml_report, 'best_model'):
+                    console.print("\n[bold cyan]Best Model:[/bold cyan]")
+                    console.print(Markdown(ml_report.best_model))
+                
+                # Display Feature Importance
+                if hasattr(ml_report, 'feature_importance'):
+                    console.print("\n[bold cyan]Feature Importance:[/bold cyan]")
+                    console.print(Markdown(ml_report.feature_importance))
+                
+                # Display Next Steps
+                if hasattr(ml_report, 'next_steps'):
+                    console.print("\n[bold cyan]Next Steps:[/bold cyan]")
+                    console.print(Markdown(ml_report.next_steps))
             
             # Add a success message
             console.print("\n[bold green]✓ Analysis complete![/bold green]")
@@ -281,7 +301,15 @@ def interactive():
             if hasattr(answer.final_output, 'query_results') and answer.final_output.query_results:
                 memory.append_assistant(answer.final_output.query_results)
             elif answer.final_output:
-                memory.append_assistant(str(answer.final_output))
+                # For Data Scientist, store a formatted version of the report
+                if agent_name == "Data Scientist":
+                    report_parts = []
+                    for attr in ['overview', 'data_analysis', 'model_details', 'results', 'recommendations']:
+                        if hasattr(answer.final_output, attr):
+                            report_parts.append(f"{attr.title()}: {getattr(answer.final_output, attr)}")
+                    memory.append_assistant("\n\n".join(report_parts))
+                else:
+                    memory.append_assistant(str(answer.final_output))
 
         except Exception as e:
             console.print(f"\n[red]❌ Error: {str(e)}[/red]")
