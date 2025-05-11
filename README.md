@@ -2,10 +2,16 @@
 
 A powerful command-line interface tool that lets you interact with your data using natural language, powered by OpenAI's GPT-4 and the OpenAI Agent SDK. Think of it as having a team of data analysts at your fingertips!
 
-## A CLI to chat with your data
+## A CLI Data Analyst to chat with your data 
 
 <h1>
-  <img src="assets/cli_preview_v2.png"/>
+  <img src="assets/data_analyst_example_cli.png"/>
+</h1>
+
+## A CLI Data Scientist to model your data
+
+<h1>
+  <img src="assets/data_scientist_example_cli.png"/>
 </h1>
 
 ## Features
