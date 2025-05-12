@@ -1,6 +1,6 @@
-# Data Analyst CLI
+# Data AI CLI
 
-A powerful command-line interface tool that lets you interact with your data using natural language, powered by OpenAI's GPT-4 and the OpenAI Agent SDK. Think of it as having a team of data analysts at your fingertips!
+A powerful command-line interface tool that lets you interact with your data using natural language, powered by LLM such as OpenAI's GPT-4o and the OpenAI Agent SDK. Think of it as having a team of data analysts at your fingertips!
 
 ## A CLI Data Analyst to chat with your data 
 
