@@ -5,15 +5,7 @@ from agents import Agent, RunContextWrapper, Runner, function_tool
 import sqlite3
 from typing import List
 import json
-
-class InputData(BaseModel):
-    df: pd.DataFrame = None
-    trained_models: dict = {}  # Store all models by name
-    trained_model: object = None  # Store the best model
-    model_results: list = []  # Optional: store all results
-    
-    class Config:
-        arbitrary_types_allowed = True
+from cli_data_ai.agents.context.context import InputData
 
 @function_tool  
 def get_input_data(wrapper: RunContextWrapper[InputData], query: str) -> str:
@@ -27,7 +19,7 @@ def get_input_data(wrapper: RunContextWrapper[InputData], query: str) -> str:
     Returns:
         An extract (up to 5 rows) of the input dataframe retrieved
     """
-    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
+    cursor = sqlite3.connect(f"{wrapper.context.database_name}.sqlite").cursor()
     try:
         import pandas as pd
         cursor.execute(query)

@@ -21,7 +21,7 @@ def create_dashboard_analyst():
         model="gpt-4o-mini",
         instructions=(
             "You are an expert data analyst helping users to visualise information stored in a database.\n"
-            "Given an analytics question, and a related SQL query, you need to choose an appropriate visualisation format such as 'bar' for bar chart or 'table' for a table chart or 'line' for a line chart and create a chart on Metabase.\n\n"
+            "Given an analytics question, and a related SQL query, you need to choose an appropriate visualisation format such as 'bar' for bar chart or 'table' for a table chart or 'line' for a line chart, 'pie' for a pie chart etc. and create a chart on Metabase.\n\n"
             "If the user asks for a dashbaord, create a dashboard with such chart(s).\n"
             "Reasoning rules:\n"
             "- Before creating a chart, you always need to log in into the platform (Metabase).\n"

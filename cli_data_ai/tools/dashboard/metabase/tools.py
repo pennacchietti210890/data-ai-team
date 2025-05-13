@@ -1,21 +1,24 @@
 from agents import function_tool
 import requests 
+from agents import Agent, RunContextWrapper, Runner, function_tool
+from pydantic import BaseModel
+from cli_data_ai.agents.context.context import InputData
 
 @function_tool  
-def login_visualisation_tool() -> str:
+def login_visualisation_tool(wrapper: RunContextWrapper[InputData]) -> str:
     
     """Logins into the Visualisation Tool: Metabase
     Returns the session token needed to create object usch as chart cards inside Metabase
     """
-    url = f"http://localhost:3000/api/session"
-    payload = {"username": "1404268@gmail.com", "password": "InterestingScientist089021@"}
+    url = f"{wrapper.context.metabase_url}/api/session"
+    payload = {"username": wrapper.context.metabase_user_name, "password": wrapper.context.metabase_password}
     response = requests.post(url, json=payload)
     response.raise_for_status()
     session_token = response.json()["id"]
     return session_token
 
 @function_tool
-def create_metabase_chart(session_token: str, sql_query: str, name: str, display: str) -> str:
+def create_metabase_chart(wrapper: RunContextWrapper[InputData],session_token: str, sql_query: str, name: str, display: str) -> str:
     """Create a Metabase chart via creating a SQL Card question and returns the corresponding url
 
     Args:
@@ -24,7 +27,7 @@ def create_metabase_chart(session_token: str, sql_query: str, name: str, display
         name: Name of the chart
         display: Visualisation type for the chart, can be one of the following: 'table', 'bar', 'line', 'pie', 'scatter', 'area'
     """
-    url = f"http://localhost:3000/api/card"
+    url = f"{wrapper.context.metabase_url}/api/card"
     headers = {"X-Metabase-Session": session_token}
 
     payload = {
@@ -46,7 +49,7 @@ def create_metabase_chart(session_token: str, sql_query: str, name: str, display
     return card_url
 
 @function_tool
-def create_metabase_dashboard(session_token: str, name: str, description: str) -> int:
+def create_metabase_dashboard(wrapper: RunContextWrapper[InputData],session_token: str, name: str, description: str) -> int:
     """Create a Metabase Dashboard and return the corresponding ID
 
     Args:
@@ -54,7 +57,7 @@ def create_metabase_dashboard(session_token: str, name: str, description: str) -
         name: Name for the dashboard
         description: Description of the dashboard
     """
-    url = f"http://localhost:3000/api/dashboard"
+    url = f"{wrapper.context.metabase_url}/api/dashboard"
     headers = {"X-Metabase-Session": session_token}
     payload = {"name": name, "description": description}
     response = requests.post(url, headers=headers, json=payload)
@@ -62,7 +65,7 @@ def create_metabase_dashboard(session_token: str, name: str, description: str) -
     return response.json()["id"]
 
 @function_tool
-def add_chart_to_metabase_dashboard(session_token: str, dashboard_id: int, card_id: int) -> str:
+def add_chart_to_metabase_dashboard(wrapper: RunContextWrapper[InputData],session_token: str, dashboard_id: int, card_id: int) -> str:
     """Add a Metabase chart (its SQL Card) to the Dashboard and return the corresponding dashboard url
 
     Args:
@@ -70,7 +73,7 @@ def add_chart_to_metabase_dashboard(session_token: str, dashboard_id: int, card_
         dashboard_id: ID for the dashboard
         card_id: ID of the Metabase Card
     """
-    url = f"http://localhost:3000/api/dashboard/{dashboard_id}/cards"
+    url = f"{wrapper.context.metabase_url}/api/dashboard/{dashboard_id}/cards"
     headers = {"X-Metabase-Session": session_token}
     payload = {
       "cards": [
@@ -88,11 +91,11 @@ def add_chart_to_metabase_dashboard(session_token: str, dashboard_id: int, card_
     }
     response = requests.put(url, headers=headers, json=payload)
     response.raise_for_status()
-    dashboard_url = f"http://localhost:3000/dashboard/{dashboard_id}"
+    dashboard_url = f"{wrapper.context.metabase_url}/dashboard/{dashboard_id}"
     return dashboard_url
 
 @function_tool
-def append_chart_to_metabase_dashboard(session_token: str, dashboard_id: int, card_id: int) -> str:
+def append_chart_to_metabase_dashboard(wrapper: RunContextWrapper[InputData],session_token: str, dashboard_id: int, card_id: int) -> str:
     """Add a Metabase chart (its SQL Card) to the Dashboard and return the corresponding dashboard url
     
     Args:
@@ -101,7 +104,7 @@ def append_chart_to_metabase_dashboard(session_token: str, dashboard_id: int, ca
         card_id: ID of the Metabase Card
     """   
     # Step 1: Fetch current dashboard layout
-    url = f"http://localhost:3000/api/dashboard/{dashboard_id}"
+    url = f"{wrapper.context.metabase_url}/api/dashboard/{dashboard_id}"
     headers = {"X-Metabase-Session": session_token}
     response = requests.get(url, headers=headers)
     
@@ -143,12 +146,12 @@ def append_chart_to_metabase_dashboard(session_token: str, dashboard_id: int, ca
     }
     
     # Step 5: PUT full layout
-    put_url = f"http://localhost:3000/api/dashboard/{dashboard_id}/cards"
+    put_url = f"{wrapper.context.metabase_url}/api/dashboard/{dashboard_id}/cards"
     payload = {
         "cards": existing_cards + [new_layout_card],
     }
     
     put_response = requests.put(put_url, headers=headers, json=payload)
     put_response.raise_for_status()
-    dashboard_url = f"http://localhost:3000/dashboard/{dashboard_id}"
+    dashboard_url = f"{wrapper.context.metabase_url}/dashboard/{dashboard_id}"
     return dashboard_url

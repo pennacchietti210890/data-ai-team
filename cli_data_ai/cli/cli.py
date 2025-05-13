@@ -14,7 +14,7 @@ from rich.syntax import Syntax
 import json
 from cli_data_ai.memory.memory import SharedMemoryManager
 from cli_data_ai.utils.events_stream import stream_events
-from cli_data_ai.tools.ml.tools import InputData
+from cli_data_ai.agents.context.context import InputData
 import pandas as pd
 
 app = typer.Typer(help="Data Analyst CLI", invoke_without_command=True)
@@ -237,7 +237,15 @@ def interactive():
             memory.append_user(question)
             question = memory.get_chat_input()
 
-            data_context = InputData(df=pd.DataFrame(), trained_models={}, trained_model=None, model_results=[])
+            data_context = InputData(
+                database_name=settings.DATABASE_NAME, 
+                metabase_url=settings.METABASE_URL, 
+                metabase_user_name=settings.METABASE_USER_NAME, 
+                metabase_password=settings.METABASE_PASSWORD, 
+                df=pd.DataFrame(), 
+                trained_models={},
+                trained_model=None, model_results=[]
+            )
             max_turns = 20
 
             if is_streaming:

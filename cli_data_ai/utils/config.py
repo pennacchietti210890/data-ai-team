@@ -16,6 +16,12 @@ class Settings(BaseSettings):
 
     # Database settings
     DATABASE_URL: str
+    DATABASE_NAME: str
+
+    # Metabase settings
+    METABASE_URL: str
+    METABASE_USER_NAME: str
+    METABASE_PASSWORD: str
 
     # LLM Provider settings
     LLM_PROVIDER: Optional[str] = None  # Can be "openai" or "groq"

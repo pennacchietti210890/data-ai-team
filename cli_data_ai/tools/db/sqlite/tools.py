@@ -1,27 +1,29 @@
 from agents import function_tool
 import sqlite3
+from cli_data_ai.agents.context.context import InputData
+from agents import RunContextWrapper
 
 @function_tool  
-def sql_query_tool(query: str) -> str:
+def sql_query_tool(wrapper: RunContextWrapper[InputData],query: str) -> str:
     
     """Executes a query SQL statement and return the results
 
     Args:
         query: The SQL query to execute to retrieve the desired results
     """
-    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
+    cursor = sqlite3.connect(f"{wrapper.context.database_name}.sqlite").cursor()
     try:
         cursor.execute(query)
-        rows = cursor.fetchall()
+        rows = cursor.fetchmany(10)
         return str(rows)
     except Exception as e:
         return f"Error executing query: {e}"
 
 @function_tool
-def describe_database() -> str:
+def describe_database(wrapper: RunContextWrapper[InputData]) -> str:
     """Describe the DataBase schema by listing tables available and their attributes
     """
-    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
+    cursor = sqlite3.connect(f"{wrapper.context.database_name}.sqlite").cursor()
     # List all tables
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = [row[0] for row in cursor.fetchall()]
@@ -36,10 +38,10 @@ def describe_database() -> str:
     return db_description
 
 @function_tool
-def profile_database()-> str:    
+def profile_database(wrapper: RunContextWrapper[InputData]) -> str:    
     """Describe in detail the possible values that the columns of the tables in the DataBase can assume. For example possible transaction types etc
     """
-    cursor = sqlite3.connect("mock_fin_app_v2.sqlite").cursor()
+    cursor = sqlite3.connect(f"{wrapper.context.database_name}.sqlite").cursor()
     # Get all tables
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = [row[0] for row in cursor.fetchall()]
