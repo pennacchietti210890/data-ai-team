@@ -11,7 +11,7 @@ A powerful command-line interface tool that lets you interact with your data usi
 ## A CLI Dashboard analyst to visualize your data
 
 <h1>
-  <img src="assets/data_visualisation_analyst.png"/>
+  <img src="assets/data_visualisation_analyst_cli.png"/>
 </h1>
 
 <h1>
