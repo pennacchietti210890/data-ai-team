@@ -8,6 +8,16 @@ A powerful command-line interface tool that lets you interact with your data usi
   <img src="assets/data_analyst_example_cli.png"/>
 </h1>
 
+## A CLI Dashboard analyst to visualize your data
+
+<h1>
+  <img src="assets/data_visualisation_analyst.png"/>
+</h1>
+
+<h1>
+  <img src="assets/example_dashboard.png"/>
+</h1>
+
 ## A CLI Data Scientist to model your data
 
 <h1>

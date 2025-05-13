@@ -22,7 +22,7 @@ def create_metabase_chart(session_token: str, sql_query: str, name: str, display
         session_token: Token ID for the session returned after login
         sql_query: SQL Query to build the chart
         name: Name of the chart
-        display: Visualisation type for the chart, can be 'table', 'bar', 'line'
+        display: Visualisation type for the chart, can be one of the following: 'table', 'bar', 'line', 'pie', 'scatter', 'area'
     """
     url = f"http://localhost:3000/api/card"
     headers = {"X-Metabase-Session": session_token}
