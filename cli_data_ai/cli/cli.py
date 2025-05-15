@@ -70,9 +70,9 @@ def load_memory() -> SharedMemoryManager:
     """Load conversation memory if it exists."""
     memory = SharedMemoryManager()
     try:
-        memory.load()
+        memory = memory.memory.load()
         console.print("[green]✓ Conversation memory loaded successfully![/green]")
-        return memory
+        return SharedMemoryManager(memory=memory)
     except Exception as e:
         console.print(f"[red]❌ Error loading memory: {str(e)}[/red]")
         return SharedMemoryManager()
@@ -184,7 +184,7 @@ def interactive():
     console.print(f"\nSelected agent: [bold blue]{agent_name}[/bold blue]")
     display_help()
 
-    # Initialize empty memory
+    # Initialize memory
     memory = SharedMemoryManager()
 
     while True:

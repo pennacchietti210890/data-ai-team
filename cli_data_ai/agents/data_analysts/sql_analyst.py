@@ -2,8 +2,9 @@ import json
 import os
 from pydantic import BaseModel
 from agents import Agent, FunctionTool, RunContextWrapper
-from cli_data_ai.tools.db.sqlite.tools import describe_database, profile_database, sql_query_tool
+from cli_data_ai.tools.db.sqlite.tools import describe_database, profile_database, sql_query_tool, create_table, drop_table, update_records, insert_record, delete_records
 from cli_data_ai.utils.config import get_settings
+from cli_data_ai.agents.data_analysts.instructions.prompts import DATA_ANALYST_INSTRUCTIONS
 
 class SQLOutput(BaseModel):
     sql_query: str
@@ -18,18 +19,9 @@ def create_sql_analyst():
         
     return Agent(
         name="SQL agent",
-        tools=[describe_database, profile_database, sql_query_tool],
-        model="gpt-4o-mini",  # Using GPT-4 as it's better for SQL analysis
-        instructions=(
-            "You are an expert data analyst helping users retrieve information from a database.\n"
-            "You can execute SQL queries directly or inspect the database schema if needed.\n\n"
-            "Reasoning rules:\n"
-            "- After executing a SQL query, always check whether the result contains useful data.\n"
-            "- If the query executes successfully but the result is empty or very small (like 0 rows),\n"
-            "you should assume the query might be wrong, incomplete, or based on wrong assumptions.\n"
-            "- In that case, consider calling `describe_database` or `profile_database` to better understand the tables and columns before trying again.\n"
-            "- Avoid giving final answers based on empty or 0-result queries without verifying schema understanding."
-        ),
+        tools=[describe_database, profile_database, sql_query_tool, create_table, drop_table, update_records, insert_record, delete_records],
+        model="gpt-4o",
+        instructions=DATA_ANALYST_INSTRUCTIONS,
         output_type=SQLOutput,
     )
 

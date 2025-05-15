@@ -77,3 +77,98 @@ def profile_database(wrapper: RunContextWrapper[InputData]) -> str:
         db_profile[table] = table_info
 
     return db_profile
+
+@function_tool
+def create_table(wrapper: RunContextWrapper[InputData], create_query: str) -> str:
+    """
+    Create a new table in the database using a CREATE TABLE AS SELECT SQL statement.
+
+    Args:
+        create_query: The SQL query to create the table.
+    """
+    try:
+        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+        cursor = conn.cursor()
+        cursor.execute(create_query)
+        conn.commit()
+        return "✅ Table created successfully."
+    except Exception as e:
+        return f"❌ Error creating table: {e}"
+    finally:
+        conn.close()
+
+@function_tool
+def drop_table(wrapper: RunContextWrapper[InputData], table_name: str) -> str:
+    """
+    Drop a table from the database.
+
+    Args:
+        table_name: Name of the table to be dropped.
+    """
+    try:
+        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+        cursor = conn.cursor()
+        cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
+        conn.commit()
+        return f"✅ Table '{table_name}' dropped successfully."
+    except Exception as e:
+        return f"❌ Error dropping table: {e}"
+    finally:
+        conn.close()
+
+@function_tool
+def update_records(wrapper: RunContextWrapper[InputData], update_query: str) -> str:
+    """
+    Update records in a table using a valid UPDATE SQL query.
+
+    Args:
+        update_query: SQL UPDATE statement with WHERE clause recommended.
+    """
+    try:
+        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+        cursor = conn.cursor()
+        cursor.execute(update_query)
+        conn.commit()
+        return f"✅ Records updated successfully. Rows affected: {cursor.rowcount}"
+    except Exception as e:
+        return f"❌ Error updating records: {e}"
+    finally:
+        conn.close()
+
+@function_tool
+def insert_record(wrapper: RunContextWrapper[InputData], insert_query: str) -> str:
+    """
+    Insert new record(s) into a table using a valid INSERT INTO SQL statement.
+
+    Args:
+        insert_query: SQL INSERT statement.
+    """
+    try:
+        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+        cursor = conn.cursor()
+        cursor.execute(insert_query)
+        conn.commit()
+        return f"✅ Record inserted successfully. Row ID: {cursor.lastrowid}"
+    except Exception as e:
+        return f"❌ Error inserting record: {e}"
+    finally:
+        conn.close()
+
+@function_tool
+def delete_records(wrapper: RunContextWrapper[InputData], delete_query: str) -> str:
+    """
+    Delete record(s) from a table using a valid DELETE SQL statement.
+
+    Args:
+        delete_query: SQL DELETE statement with WHERE clause recommended.
+    """
+    try:
+        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+        cursor = conn.cursor()
+        cursor.execute(delete_query)
+        conn.commit()
+        return f"✅ Records deleted successfully. Rows affected: {cursor.rowcount}"
+    except Exception as e:
+        return f"❌ Error deleting records: {e}"
+    finally:
+        conn.close()
