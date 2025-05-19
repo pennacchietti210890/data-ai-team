@@ -87,11 +87,14 @@ def create_table(wrapper: RunContextWrapper[InputData], create_query: str) -> st
         create_query: The SQL query to create the table.
     """
     try:
-        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
-        cursor = conn.cursor()
-        cursor.execute(create_query)
-        conn.commit()
-        return "✅ Table created successfully."
+        if wrapper.context.human_confirmation:
+            conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+            cursor = conn.cursor()
+            cursor.execute(create_query)
+            conn.commit()
+            return "✅ Table created successfully."
+        else:
+            return "❌ Human confirmation required. Please confirm the action."
     except Exception as e:
         return f"❌ Error creating table: {e}"
     finally:
@@ -106,11 +109,14 @@ def drop_table(wrapper: RunContextWrapper[InputData], table_name: str) -> str:
         table_name: Name of the table to be dropped.
     """
     try:
-        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
-        cursor = conn.cursor()
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
-        conn.commit()
-        return f"✅ Table '{table_name}' dropped successfully."
+        if wrapper.context.human_confirmation:
+            conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+            cursor = conn.cursor()
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
+            conn.commit()
+            return f"✅ Table '{table_name}' dropped successfully."
+        else:
+            return "❌ Human confirmation required. Please confirm the action."
     except Exception as e:
         return f"❌ Error dropping table: {e}"
     finally:
@@ -125,11 +131,14 @@ def update_records(wrapper: RunContextWrapper[InputData], update_query: str) -> 
         update_query: SQL UPDATE statement with WHERE clause recommended.
     """
     try:
-        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
-        cursor = conn.cursor()
-        cursor.execute(update_query)
-        conn.commit()
-        return f"✅ Records updated successfully. Rows affected: {cursor.rowcount}"
+        if wrapper.context.human_confirmation:
+            conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+            cursor = conn.cursor()
+            cursor.execute(update_query)
+            conn.commit()
+            return f"✅ Records updated successfully. Rows affected: {cursor.rowcount}"
+        else:
+            return "❌ Human confirmation required. Please confirm the action."
     except Exception as e:
         return f"❌ Error updating records: {e}"
     finally:
@@ -144,11 +153,14 @@ def insert_record(wrapper: RunContextWrapper[InputData], insert_query: str) -> s
         insert_query: SQL INSERT statement.
     """
     try:
-        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
-        cursor = conn.cursor()
-        cursor.execute(insert_query)
-        conn.commit()
-        return f"✅ Record inserted successfully. Row ID: {cursor.lastrowid}"
+        if wrapper.context.human_confirmation:
+            conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+            cursor = conn.cursor()
+            cursor.execute(insert_query)
+            conn.commit()
+            return f"✅ Record inserted successfully. Row ID: {cursor.lastrowid}"
+        else:
+            return "❌ Human confirmation required. Please confirm the action."
     except Exception as e:
         return f"❌ Error inserting record: {e}"
     finally:
@@ -163,11 +175,14 @@ def delete_records(wrapper: RunContextWrapper[InputData], delete_query: str) -> 
         delete_query: SQL DELETE statement with WHERE clause recommended.
     """
     try:
-        conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
-        cursor = conn.cursor()
-        cursor.execute(delete_query)
-        conn.commit()
-        return f"✅ Records deleted successfully. Rows affected: {cursor.rowcount}"
+        if wrapper.context.human_confirmation:
+            conn = sqlite3.connect(f"{wrapper.context.database_name}.sqlite")
+            cursor = conn.cursor()
+            cursor.execute(delete_query)
+            conn.commit()
+            return f"✅ Records deleted successfully. Rows affected: {cursor.rowcount}"
+        else:
+            return "❌ Human confirmation required. Please confirm the action."
     except Exception as e:
         return f"❌ Error deleting records: {e}"
     finally:

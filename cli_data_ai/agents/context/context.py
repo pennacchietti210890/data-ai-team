@@ -14,6 +14,7 @@ class InputData(BaseModel):
     trained_models: dict = {}  # Store all models by name
     trained_model: object = None  # Store the best model
     model_results: list = []  # Optional: store all results
-    
+    human_confirmation: bool = False
+
     class Config:
         arbitrary_types_allowed = True

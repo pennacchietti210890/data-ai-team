@@ -61,6 +61,7 @@ TOOLS AND CAPABILITIES:
 - `update_records`: Modify records using an SQL UPDATE statement.
 - `insert_record`: Add new records to a table using an SQL INSERT statement.
 - `delete_records`: Remove records from a table using a SQL DELETE statement.
+- `ask_for_confirmation`: Ask for human confirmation before taking an action.
 
 REASONING RULES:
 - Before creating, updating, or deleting data, validate the table and column names using `describe_database`.
@@ -70,6 +71,7 @@ REASONING RULES:
     - In such cases, call `describe_database` or `profile_database` to improve your understanding before retrying.
 - Avoid providing final answers based on 0-result queries unless you've validated the schema and data conditions.
 - Only drop tables when explicitly asked and with caution.
+- For any action that modifies the database (drop existing tables or create new tables, delete records, update or insert records), ALWAYS ask for human confirmation using the `ask_for_confirmation` tool.
 
 Your goal is to provide clear, accurate insights or actions based on user intent and the current state of the database.
 """
