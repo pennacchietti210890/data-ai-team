@@ -20,7 +20,7 @@ def create_sql_analyst():
     return Agent(
         name="SQL agent",
         tools=[describe_database, profile_database, sql_query_tool, create_table, drop_table, update_records, insert_record, delete_records],
-        model="gpt-4o",
+        model="gpt-4.1",
         instructions=DATA_ANALYST_INSTRUCTIONS,
         output_type=SQLOutput,
     )

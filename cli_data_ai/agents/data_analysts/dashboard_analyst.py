@@ -16,7 +16,7 @@ def create_dashboard_analyst():
     return Agent(
         name="Visualisation agent",
         tools=[login_visualisation_tool, create_metabase_chart, create_metabase_dashboard, append_chart_to_metabase_dashboard],  
-        model="gpt-4o",
+        model="gpt-4.1",
         instructions=DASHBOARD_ANALYST_INSTRUCTIONS
     )
 

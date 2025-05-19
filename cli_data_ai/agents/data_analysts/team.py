@@ -16,7 +16,7 @@ def create_team():
         
     return Agent(
         name="Manager agent", 
-        model="gpt-4o",
+        model="gpt-4.1",
         instructions=DATA_MANAGER_INSTRUCTIONS,
         tools=[
             sql_analyst.as_tool(

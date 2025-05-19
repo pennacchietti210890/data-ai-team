@@ -31,7 +31,7 @@ def create_data_scientist():
             select_best_model,
             feature_importance
         ],  
-        model="gpt-4o",
+        model="gpt-4.1",
         instructions=DATA_SCIENTIST_INSTRUCTIONS,
         output_guardrails=[ml_report_guardrail_complete],
         output_type=MLReport,
